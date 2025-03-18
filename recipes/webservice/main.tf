@@ -18,12 +18,12 @@ variable "image" {
   type = string
 }
 
-variable "cpu-request" {
+variable "cpuRequest" {
   description = "Minimum number of vCPUs in integers"
   type = number
 }
 
-variable "memory-request" {
+variable "memoryRequest" {
   description = "Minimum amount of memory in mebibyte or gibibytes"
   type = string
 }
@@ -65,8 +65,8 @@ resource "kubernetes_deployment" "webservice" {
           }
           resources {
             requests = {
-              cpu    = var.cpu-request
-              memory = var.memory-request
+              cpu    = var.cpuRequest
+              memory = var.memoryRequest
             }
           }
         }
