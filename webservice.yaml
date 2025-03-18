@@ -1,0 +1,22 @@
+name: Clover.App
+types:
+  webservice:
+    apiVersions:
+      '2025-10-18':
+        schema: 
+          type: object
+          properties:
+            image:
+              type: string
+              description: Container image name
+            cpu-request:
+              type: int
+              description: Minimum number of vCPUs in integers
+            memory-request:
+              type: string
+              description: Minimum amount of memory in mebibyte or gibibytes (e.g., 256Mi or 0.25Gi)
+            containerPort:
+              type: int
+              description: Port application is listening on
+
+    capabilities: ["SupportsRecipes"]
