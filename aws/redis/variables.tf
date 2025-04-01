@@ -1,4 +1,4 @@
 variable "context" {
-  description = "This variable contains Radius recipe context."
-  type        = any
+  description = "Radius-provided object containing information about the resource calling the Recipe."
+  type = any
 }
