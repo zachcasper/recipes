@@ -77,7 +77,7 @@ resource mysql 'apps/Deployment@v1' = {
 
 resource svc 'core/Service@v1' = {
   metadata: {
-    name: '${context.application.name}-mysql'
+    name: 'mysql'
     labels: {
       app: context.application.name
     }
