@@ -36,7 +36,7 @@ output "result" {
     values = {
       host = aws_db_instance.mysql.address
       port = aws_db_instance.mysql.port
-      database = aws_db_instance.mysql.database
+      database = aws_db_instance.mysql.db_name
       username = aws_db_instance.mysql.username
       password = "WU9VUl9QQVNTV09SRA=="
     }
