@@ -13,7 +13,7 @@ variable "context" {
 }
 
 locals {
-  appName = var.context.application.id
+  appName = var.context.application.name
   uniqueName = var.context.resource.name
   port     = 3306
   namespace = var.context.runtime.kubernetes.namespace
