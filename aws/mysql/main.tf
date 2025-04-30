@@ -7,10 +7,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = var.region
-}
-
 variable "context" {
   description = "This variable contains Radius recipe context."
   type = any
