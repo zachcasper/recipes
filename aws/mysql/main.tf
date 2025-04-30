@@ -59,7 +59,7 @@ resource "aws_db_instance" "mysql" {
   username             = var.context.application.name
   password             = "WU9VUl9QQVNTV09SRA=="
   parameter_group_name = "default.mysql8.0"
-  db_subnet_group_name   = aws_db_subnet_group.education.name
+  db_subnet_group_name   = aws_db_subnet_group.mysql.name
   vpc_security_group_ids = [aws_security_group.rds.id]
   skip_final_snapshot  = true
   publicly_accessible =  true
