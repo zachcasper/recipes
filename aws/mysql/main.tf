@@ -16,7 +16,7 @@ data "aws_availability_zones" "available" {}
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.77.0"
+  version = "~> 5.0"
 
   name                 = "mysql"
   cidr                 = "10.0.0.0/16"
