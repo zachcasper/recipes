@@ -7,16 +7,6 @@ terraform {
   }
 }
 
-provider "aws" {
-    region     = "us-east-2"
-}
-
-variable "context" {
-  description = "This variable contains Radius recipe context."
-  type = any
-}
-
-
 resource "aws_db_instance" "mysql" {
   engine               = "mysql"
   identifier           = var.context.application.name
