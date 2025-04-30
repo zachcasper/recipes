@@ -53,7 +53,7 @@ resource "aws_security_group" "rds" {
 
 resource "aws_db_instance" "mysql" {
   identifier             = "mysql"
-  instance_class         = "db.t3.micro"
+  instance_class         = "db.m7i.large"
   allocated_storage      = 5
   engine                 = "mysql"
   engine_version         = "8.0"
