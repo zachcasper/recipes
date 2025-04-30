@@ -70,7 +70,7 @@ resource "kubernetes_deployment" "mysql" {
   }
 }
 
-resource "kubernetes_service" "${local.uniqueName}-mysql" {
+resource "kubernetes_service" "mysql" {
   metadata {
     name      = local.uniqueName
     namespace = local.namespace
