@@ -29,7 +29,7 @@ variable "location" {
   type = string
 }
 
-resource "azurerm_postgresql_server" "todolist-db" {
+resource "azurerm_postgresql_flexible_server" "todolist-db" {
   name                = module.naming.postgresql_database.name_unique
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -39,9 +39,6 @@ resource "azurerm_postgresql_server" "todolist-db" {
 
   sku_name   = "GP_Gen5_4"
   version    = "11"
-
-  ssl_enforcement_enabled          = true
-  ssl_minimal_tls_version_enforced = "TLS1_2"
 }
 
 output "result" {
