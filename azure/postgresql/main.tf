@@ -37,14 +37,13 @@ resource "azurerm_postgresql_flexible_server" "todolist-db" {
   administrator_login          = "postgres"
   administrator_password       = random_password.password.result
 
-  sku_name   = "GP_Gen5_4"
   version    = "11"
 }
 
 output "result" {
   value = {
     values = {
-      host = azurerm_postgresql_server.todolist-db.fqdn
+      host = azurerm_postgresql_flexible_server.todolist-db.fqdn
       port = "5432"
       database = "postgres_db"
       username = "postgres"
