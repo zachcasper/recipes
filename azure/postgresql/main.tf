@@ -37,6 +37,7 @@ resource "azurerm_postgresql_flexible_server" "todolist-db" {
   administrator_login          = "postgres"
   administrator_password       = random_password.password.result
 
+  sku_name   = "B_Standard_B1ms"
   version    = "11"
 }
 
