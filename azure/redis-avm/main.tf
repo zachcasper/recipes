@@ -46,6 +46,7 @@ module "naming" {
   prefix = [ var.context.application.name ]
 }
 
+/*
 provider "azurerm" {
   features {
     resource_group {
@@ -53,6 +54,7 @@ provider "azurerm" {
     }
   }
 }
+*/
 
 resource "azurerm_resource_group" "this" {
   location = var.location
