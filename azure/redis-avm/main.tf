@@ -61,12 +61,12 @@ resource "azurerm_resource_group" "this" {
 
 resource "azurerm_private_dns_zone" "this" {
   name                = "privatelink.redis.cache.windows.net"
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.this.name
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "this" {
   name                  = "vnet-link"
-  resource_group_name   = var.resource_group_name
+  resource_group_name   = azurerm_resource_group.this.name
   private_dns_zone_name = azurerm_private_dns_zone.this.name
   virtual_network_id    = var.vnet_id
 }
