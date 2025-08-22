@@ -2,6 +2,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
+      #  version = "~> 5.0" # Specify a version constraint
     }
   }
 }
@@ -9,7 +10,7 @@ terraform {
 variable "gcp_service_account_key" {
   description = "The content of the Google Service Account key file in JSON format."
   type        = string
-  sensitive   = true
+  #  sensitive   = true
 }
 
 provider "google" {
