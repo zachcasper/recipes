@@ -15,7 +15,7 @@ variable "gcp_service_account_key" {
 
 provider "google" {
   project     = "radius-cloud-run"
-  region      = "us-central1"
+  region      = var.region
   credentials = var.gcp_service_account_key
 }
 
@@ -26,6 +26,11 @@ variable "context" {
 
 variable "project_id" {
   description = "The project ID to deploy to"
+  type        = string
+}
+
+variable "region" {
+  description = "The GCP region"
   type        = string
 }
 
@@ -43,8 +48,12 @@ module "cloud_run" {
 
   service_name          = "ci-cloud-run"
   project_id            = var.project_id
-  location              = "us-central1"
-  image                 = "us-docker.pkg.dev/cloudrun/container/hello"
+  location              = var.region
+  image                 = var.context.resource.properties.container.image
+  ports = {
+    name = var.context.resource.properties.container.web
+    port = var.context.resource.properties.container.web.containerPort
+  }
   service_account_email = module.service_account.email
 }
 
