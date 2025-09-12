@@ -212,6 +212,7 @@ output "result" {
       secrets = {
         apiKey = azurerm_cognitive_account.openai[0].primary_access_key
       }
+      sensitive = true
     } : null
   )
 }
