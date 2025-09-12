@@ -198,16 +198,16 @@ output "result" {
     values = {
       endpoint = "http://${kubernetes_service.llama[0].metadata[0].name}.${kubernetes_service.llama[0].metadata[0].namespace}.svc.cluster.local:80"
     }
-    } : (
+  } : (
     var.context.resource.properties.model == "gpt35" ? {
       values = {
         apiVersion = "2023-05-15"
-        endpoint   = azurerm_cognitive_account.openai.endpoint
+        endpoint   = azurerm_cognitive_account.openai[0].endpoint
         model      = var.context.resource.properties.model
       }
       # Warning: sensitive output
       secrets = {
-        apiKey = azurerm_cognitive_account.openai.primary_access_key
+        apiKey = azurerm_cognitive_account.openai[0].primary_access_key
       }
       sensitive = true
     } : null
