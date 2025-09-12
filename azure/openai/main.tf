@@ -196,16 +196,19 @@ resource "kubernetes_service" "llama" {
 output "result" {
   value = var.context.resource.properties.model == "tinyllama" ? {
     values = {
-      endpoint = "http://${kubernetes_service.llama[0].metadata[0].name}.${kubernetes_service.llama[0].metadata[0].namespace}.svc.cluster.local:80"
+      apiVersion = null
+      endpoint   = "http://${kubernetes_service.llama[0].metadata[0].name}.${kubernetes_service.llama[0].metadata[0].namespace}.svc.cluster.local:80"
+      model      = "tinyllama"
     }
+    secrets   = {}
+    sensitive = false
   } : (
     var.context.resource.properties.model == "gpt35" ? {
       values = {
         apiVersion = "2023-05-15"
         endpoint   = azurerm_cognitive_account.openai[0].endpoint
-        model      = var.context.resource.properties.model
+        model      = "gpt35"
       }
-      # Warning: sensitive output
       secrets = {
         apiKey = azurerm_cognitive_account.openai[0].primary_access_key
       }
