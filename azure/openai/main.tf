@@ -20,7 +20,7 @@ variable "model_file_name" {
 }
 
 variable "location" {
-  type    = string
+  type = string
 }
 
 variable "resource_group_name" {
@@ -29,15 +29,15 @@ variable "resource_group_name" {
 
 variable "context" {
   description = "This variable contains Radius recipe context."
-  type = any
+  type        = any
 }
 
 locals {
-   uniqueName = var.context.resource.name
+  uniqueName = var.context.resource.name
 }
 
 resource "azurerm_cognitive_account" "openai" {
-  count = var.context.resource.properties.model == "gpt35" ? 1 : 0
+  count               = var.context.resource.properties.model == "gpt35" ? 1 : 0
   name                = local.uniqueName
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -46,21 +46,21 @@ resource "azurerm_cognitive_account" "openai" {
 }
 
 resource "azurerm_cognitive_deployment" "gpt35" {
-    count = var.context.resource.properties.model == "gpt35" ? 1 : 0
-    name = var.context.resource.properties.model
-    cognitive_account_id = azurerm_cognitive_account.openai.id
-    model {
-        format = "OpenAI"
-        name = var.context.resource.properties.model
-        version= "0125"
-      }
-    rai_policy_name        = "Microsoft.Default"
-    version_upgrade_option = "OnceNewDefaultVersionAvailable"  
-    sku {
-      name     = "Standard"
-      capacity = "10"
-    }
+  count                = var.context.resource.properties.model == "gpt35" ? 1 : 0
+  name                 = var.context.resource.properties.model
+  cognitive_account_id = azurerm_cognitive_account.openai[0].id
+  model {
+    format  = "OpenAI"
+    name    = var.context.resource.properties.model
+    version = "0125"
   }
+  rai_policy_name        = "Microsoft.Default"
+  version_upgrade_option = "OnceNewDefaultVersionAvailable"
+  sku {
+    name     = "Standard"
+    capacity = "10"
+  }
+}
 
 resource "kubernetes_deployment" "llama" {
   count = var.context.resource.properties.model == "tinyllama" ? 1 : 0
@@ -91,8 +91,8 @@ resource "kubernetes_deployment" "llama" {
 
       spec {
         init_container {
-          name  = "download-model"
-          image = "curlimages/curl:latest"
+          name    = "download-model"
+          image   = "curlimages/curl:latest"
           command = ["sh", "-c"]
           args = [
             "curl -L --fail --show-error --progress-bar ${var.model_url} -o /models/${var.model_file_name} && ls -la /models/"
@@ -113,13 +113,13 @@ resource "kubernetes_deployment" "llama" {
           }
 
           command = ["/app/llama-server"]
-          args    = [
-            "--model", "/models/${var.model_file_name}", 
-            "--host", "0.0.0.0", 
+          args = [
+            "--model", "/models/${var.model_file_name}",
+            "--host", "0.0.0.0",
             "--port", "8080",
-            "--ctx-size", "512",           # Smaller context for speed
-            "--n-predict", "50",           # Match max_tokens from frontend
-            "--threads", "4",              # Optimize thread usage
+            "--ctx-size", "512", # Smaller context for speed
+            "--n-predict", "50", # Match max_tokens from frontend
+            "--threads", "4",    # Optimize thread usage
           ]
 
           volume_mount {
@@ -129,12 +129,12 @@ resource "kubernetes_deployment" "llama" {
 
           resources {
             requests = {
-              memory = "6Gi"              # Increased from 4Gi
-              cpu    = "2000m"            # Increased from 1000m
+              memory = "6Gi"   # Increased from 4Gi
+              cpu    = "2000m" # Increased from 1000m
             }
             limits = {
-              memory = "12Gi"             # Increased from 8Gi
-              cpu    = "6000m"            # Increased from 4000m
+              memory = "12Gi"  # Increased from 8Gi
+              cpu    = "6000m" # Increased from 4000m
             }
           }
 
@@ -144,9 +144,9 @@ resource "kubernetes_deployment" "llama" {
               port = 8080
             }
             initial_delay_seconds = 120
-            period_seconds = 30
-            timeout_seconds = 10
-            failure_threshold = 3
+            period_seconds        = 30
+            timeout_seconds       = 10
+            failure_threshold     = 3
           }
 
           readiness_probe {
@@ -155,9 +155,9 @@ resource "kubernetes_deployment" "llama" {
               port = 8080
             }
             initial_delay_seconds = 60
-            period_seconds = 10
-            timeout_seconds = 5
-            failure_threshold = 3
+            period_seconds        = 10
+            timeout_seconds       = 5
+            failure_threshold     = 3
           }
         }
 
@@ -196,9 +196,9 @@ resource "kubernetes_service" "llama" {
 output "result" {
   value = var.context.resource.properties.model == "tinyllama" ? {
     values = {
-      endpoint = "http://${kubernetes_service.llama.metadata[0].name}.${kubernetes_service.llama.metadata[0].namespace}.svc.cluster.local:80"
+      endpoint = "http://${kubernetes_service.llama[0].metadata[0].name}.${kubernetes_service.llama[0].metadata[0].namespace}.svc.cluster.local:80"
     }
-  } : (
+    } : (
     var.context.resource.properties.model == "gpt35" ? {
       values = {
         apiVersion = "2023-05-15"
