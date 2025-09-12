@@ -193,16 +193,12 @@ resource "kubernetes_service" "llama" {
   }
 }
 
-
-
-
 output "result" {
   value = var.context.resource.properties.model == "tinyllama" ? {
     values = {
       endpoint = "http://${kubernetes_service.llama.metadata[0].name}.${kubernetes_service.llama.metadata[0].namespace}.svc.cluster.local:80"
-    } : null
-  }
-  value = value = var.context.resource.properties.model == "gpt35" ? {
+    } 
+  } : value = value = var.context.resource.properties.model == "gpt35" ? {
     values = {
       apiVersion = "2023-05-15"
       endpoint   = azurerm_cognitive_account.openai.endpoint
@@ -212,6 +208,6 @@ output "result" {
     secrets = {
       apiKey = azurerm_cognitive_account.openai.primary_access_key
     }
+    sensitive = true
   } : null
-  sensitive = true
 }
