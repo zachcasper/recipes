@@ -26,7 +26,7 @@ module "vpc" {
   enable_dns_support   = true
 }
 
-resource "aws_db_subnet_group" "mysql" {
+resource "aws_db_subnet_group" "postgresql" {
   name       = "mysql"
   subnet_ids = module.vpc.public_subnets
 }
