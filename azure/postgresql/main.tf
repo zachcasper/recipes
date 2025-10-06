@@ -33,7 +33,7 @@ resource "azurerm_postgresql_flexible_server" "todolist-db" {
   name                = module.naming.postgresql_database.name_unique
   location            = var.location
   resource_group_name = var.resource_group_name
-
+  public_network_access_enabled = true
   administrator_login          = "postgres"
   administrator_password       = random_password.password.result
 
