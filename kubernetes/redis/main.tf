@@ -16,6 +16,17 @@ locals {
   uniqueName = var.context.resource.name
   port       = 6379
   namespace  = var.context.runtime.kubernetes.namespace
+
+  # Determine memory capacity based on user input (S, M, L)
+  capacity = lookup(
+    {
+      S = "256mb"
+      M = "512mb"
+      L = "1gb"
+    },
+    lower(try(var.context.resource.properties.capacity, "M")), # default to M
+    "512mb"
+  )
 }
 
 # Generate a secure random password
@@ -53,11 +64,23 @@ resource "kubernetes_deployment" "redis" {
           command = [
             "redis-server",
             "--requirepass", random_password.password.result,
-            "--protected-mode", "no"
+            "--protected-mode", "no",
+            "--maxmemory", local.capacity,
+            "--maxmemory-policy", "allkeys-lru"
           ]
 
           port {
             container_port = local.port
+          }
+
+          # Apply memory limit to match the chosen capacity
+          resources {
+            limits = {
+              memory = local.capacity
+            }
+            requests = {
+              memory = local.capacity
+            }
           }
         }
       }
@@ -89,6 +112,7 @@ output "result" {
       host     = "${kubernetes_service.redis.metadata[0].name}.${kubernetes_service.redis.metadata[0].namespace}.svc.cluster.local"
       port     = local.port
       password = random_password.password.result
+      capacity = local.capacity
     }
   }
 }
