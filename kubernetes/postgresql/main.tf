@@ -26,6 +26,10 @@ variable "memory" {
     M = {
       memoryRequest = "1Gi"
       memoryLimit   = "2Gi"
+    },
+    L = {
+      memoryRequest = "2Gi"
+      memoryLimit   = "4Gi"
     }
   }
 }
