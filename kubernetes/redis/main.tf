@@ -1,38 +1,29 @@
-terraform {
-  required_providers {
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = ">= 2.0"
-    }
-  }
-}
-
-variable "context" {
-  description = "This variable contains Radius recipe context."
-  type        = any
-}
-
 locals {
   uniqueName = var.context.resource.name
   port       = 6379
   namespace  = var.context.runtime.kubernetes.namespace
 
-  # Determine memory capacity based on user input (S, M, L)
+  # Valid Kubernetes memory values
   capacity = lookup(
+    {
+      S = "256Mi"
+      M = "512Mi"
+      L = "1Gi"
+    },
+    upper(try(var.context.resource.properties.capacity, "M")),
+    "512Mi"
+  )
+
+  # Convert to human-friendly for Redis CLI flag (e.g., 256mb)
+  redis_capacity = lookup(
     {
       S = "256mb"
       M = "512mb"
       L = "1gb"
     },
-    lower(try(var.context.resource.properties.capacity, "M")), # default to M
+    upper(try(var.context.resource.properties.capacity, "M")),
     "512mb"
   )
-}
-
-# Generate a secure random password
-resource "random_password" "password" {
-  length  = 16
-  special = false
 }
 
 resource "kubernetes_deployment" "redis" {
@@ -60,12 +51,11 @@ resource "kubernetes_deployment" "redis" {
           name  = "redis"
           image = "redis:7-alpine"
 
-          # Redis authentication (requirepass)
           command = [
             "redis-server",
             "--requirepass", random_password.password.result,
             "--protected-mode", "no",
-            "--maxmemory", local.capacity,
+            "--maxmemory", local.redis_capacity,
             "--maxmemory-policy", "allkeys-lru"
           ]
 
@@ -73,7 +63,7 @@ resource "kubernetes_deployment" "redis" {
             container_port = local.port
           }
 
-          # Apply memory limit to match the chosen capacity
+          # ✅ Correct Kubernetes resource units
           resources {
             limits = {
               memory = local.capacity
@@ -84,35 +74,6 @@ resource "kubernetes_deployment" "redis" {
           }
         }
       }
-    }
-  }
-}
-
-resource "kubernetes_service" "redis" {
-  metadata {
-    name      = local.uniqueName
-    namespace = local.namespace
-  }
-
-  spec {
-    selector = {
-      app = "redis"
-    }
-
-    port {
-      port        = local.port
-      target_port = local.port
-    }
-  }
-}
-
-output "result" {
-  value = {
-    values = {
-      host     = "${kubernetes_service.redis.metadata[0].name}.${kubernetes_service.redis.metadata[0].namespace}.svc.cluster.local"
-      port     = local.port
-      password = random_password.password.result
-      capacity = local.capacity
     }
   }
 }
