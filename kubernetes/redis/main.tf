@@ -9,20 +9,22 @@ terraform {
 
 variable "context" {
   description = "This variable contains Radius recipe context."
-  type = any
+  type        = any
 }
 
 locals {
   uniqueName = var.context.resource.name
-  port     = 5432
-  namespace = var.context.runtime.kubernetes.namespace
+  port       = 6379
+  namespace  = var.context.runtime.kubernetes.namespace
 }
 
+# Generate a secure random password
 resource "random_password" "password" {
-  length           = 16
+  length  = 16
+  special = false
 }
 
-resource "kubernetes_deployment" "postgresql" {
+resource "kubernetes_deployment" "redis" {
   metadata {
     name      = local.uniqueName
     namespace = local.namespace
@@ -31,33 +33,29 @@ resource "kubernetes_deployment" "postgresql" {
   spec {
     selector {
       match_labels = {
-        app = "postgres"
+        app = "redis"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "postgres"
+          app = "redis"
         }
       }
 
       spec {
         container {
-          image = "postgres:16-alpine"
-          name  = "postgres"
-          env {
-            name  = "POSTGRES_PASSWORD"
-            value = random_password.password.result
-          }
-          env {
-            name = "POSTGRES_USER"
-            value = "postgres"
-          }
-          env {
-            name  = "POSTGRES_DB"
-            value = "postgres_db"
-          }
+          name  = "redis"
+          image = "redis:7-alpine"
+
+          # Redis authentication (requirepass)
+          command = [
+            "redis-server",
+            "--requirepass", random_password.password.result,
+            "--protected-mode", "no"
+          ]
+
           port {
             container_port = local.port
           }
@@ -67,7 +65,7 @@ resource "kubernetes_deployment" "postgresql" {
   }
 }
 
-resource "kubernetes_service" "postgres" {
+resource "kubernetes_service" "redis" {
   metadata {
     name      = local.uniqueName
     namespace = local.namespace
@@ -75,23 +73,21 @@ resource "kubernetes_service" "postgres" {
 
   spec {
     selector = {
-      app = "postgres"
+      app = "redis"
     }
 
     port {
       port        = local.port
       target_port = local.port
-    } 
+    }
   }
 }
 
 output "result" {
   value = {
     values = {
-      host = "${kubernetes_service.postgres.metadata[0].name}.${kubernetes_service.postgres.metadata[0].namespace}.svc.cluster.local"
-      port = local.port
-      database = "postgres_db"
-      username = "postgres"
+      host     = "${kubernetes_service.redis.metadata[0].name}.${kubernetes_service.redis.metadata[0].namespace}.svc.cluster.local"
+      port     = local.port
       password = random_password.password.result
     }
   }
