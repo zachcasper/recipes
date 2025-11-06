@@ -1,3 +1,17 @@
+terraform {
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.0"
+    }
+  }
+}
+
+variable "context" {
+  description = "This variable contains Radius recipe context."
+  type        = any
+}
+
 locals {
   uniqueName = var.context.resource.name
   port       = 6379
@@ -25,6 +39,13 @@ locals {
     "512mb"
   )
 }
+
+# Generate a secure random password
+resource "random_password" "password" {
+  length  = 16
+  special = false
+}
+
 
 resource "kubernetes_deployment" "redis" {
   metadata {
@@ -74,6 +95,35 @@ resource "kubernetes_deployment" "redis" {
           }
         }
       }
+    }
+  }
+}
+
+resource "kubernetes_service" "redis" {
+  metadata {
+    name      = local.uniqueName
+    namespace = local.namespace
+  }
+
+  spec {
+    selector = {
+      app = "redis"
+    }
+
+    port {
+      port        = local.port
+      target_port = local.port
+    }
+  }
+}
+
+output "result" {
+  value = {
+    values = {
+      host     = "${kubernetes_service.redis.metadata[0].name}.${kubernetes_service.redis.metadata[0].namespace}.svc.cluster.local"
+      port     = local.port
+      password = random_password.password.result
+      capacity = local.capacity
     }
   }
 }
