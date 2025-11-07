@@ -42,6 +42,7 @@ locals {
 
 resource "random_password" "password" {
   length           = 16
+  special = false
 }
 
 resource "kubernetes_deployment" "postgresql" {
