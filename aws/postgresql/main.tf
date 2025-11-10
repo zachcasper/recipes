@@ -84,7 +84,7 @@ output "result" {
       port = aws_db_instance.postgres.port
       database = aws_db_instance.postgres.username
       username = aws_db_instance.postgres.username
-      password = "WU9VUl9QQVNTV09SRA=="
+      password = random_password.db_password.result
     }
   }
 }
