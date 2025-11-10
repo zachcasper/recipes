@@ -42,11 +42,10 @@ resource "azurerm_postgresql_flexible_server" "todolist-db" {
 }
 
 resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_all" {
-  name                = "allow-all"
-  resource_group_name = var.resource_group_name
-  server_name         = azurerm_postgresql_flexible_server.todolist-db.name
-  start_ip_address    = "0.0.0.0"
-  end_ip_address      = "255.255.255.255"
+  name      = "allow-all"
+  server_id = azurerm_postgresql_flexible_server.todolist-db.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "255.255.255.255"
 }
 
 output "result" {
