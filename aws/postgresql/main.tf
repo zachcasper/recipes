@@ -68,7 +68,7 @@ resource "aws_db_instance" "postgres" {
   allocated_storage      = 5
   engine                 = "postgres"
   engine_version         = "14"
-  username               = "postgresql_user"
+  username               = "postgres"
   password               = random_password.db_password.result
   db_subnet_group_name   = aws_db_subnet_group.postgresql.name
   vpc_security_group_ids = [aws_security_group.rds.id]
@@ -77,28 +77,12 @@ resource "aws_db_instance" "postgres" {
   skip_final_snapshot    = true
 }
 
-# --- Create the database after the instance is ready ---
-resource "null_resource" "create_db" {
-  depends_on = [aws_db_instance.postgres]
-
-  provisioner "local-exec" {
-    command = <<EOT
-PGPASSWORD="${random_password.db_password.result}" psql \
-  -h ${aws_db_instance.postgres.address} \
-  -U ${aws_db_instance.postgres.username} \
-  -p ${aws_db_instance.postgres.port} \
-  -c "CREATE DATABASE postgres_db;"
-EOT
-    interpreter = ["/bin/bash", "-c"]
-  }
-}
-
 output "result" {
   value = {
     values = {
       host = aws_db_instance.postgres.address
       port = aws_db_instance.postgres.port
-      database = "postgres_db"
+      database = aws_db_instance.postgres.username
       username = aws_db_instance.postgres.username
       password = "WU9VUl9QQVNTV09SRA=="
     }
