@@ -59,6 +59,7 @@ resource "aws_db_instance" "postgres" {
   engine_version         = "14"
   username               = "postgresql_user"
   password               = "WU9VUl9QQVNTV09SRA=="
+  name                   = "postgres_db"
   db_subnet_group_name   = aws_db_subnet_group.postgresql.name
   vpc_security_group_ids = [aws_security_group.rds.id]
   parameter_group_name   = "default.postgres14"
