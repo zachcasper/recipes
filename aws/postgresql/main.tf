@@ -85,6 +85,7 @@ output "result" {
       database = aws_db_instance.postgres.username
       username = aws_db_instance.postgres.username
       password = random_password.db_password.result
+      ssl = false
     }
   }
 }
