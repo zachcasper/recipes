@@ -124,6 +124,7 @@ output "result" {
       database = "postgres_db"
       username = "postgres"
       password = random_password.password.result
+      ssl = false
     }
   }
 }
