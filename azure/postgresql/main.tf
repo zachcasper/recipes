@@ -54,7 +54,7 @@ output "result" {
     values = {
       host = azurerm_postgresql_flexible_server.todolist-db.fqdn
       port = "5432"
-      database = "postgres_db"
+      database = "postgres"
       username = "postgres"
       password = random_password.password.result
     }
