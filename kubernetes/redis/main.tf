@@ -126,7 +126,7 @@ output "result" {
       username = ""
     }
     secrets = {
-      password = ""
+      password = random_password.password.result
     }
     // UCP resource IDs
     resources = [
