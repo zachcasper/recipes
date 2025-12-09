@@ -114,10 +114,10 @@ resource "aws_memorydb_cluster" "memorydb_cluster" {
 output "result" {
   value = {
     values = {
-      host = aws_memorydb_cluster.memorydb_cluster.cluster_endpoint.address
-      port = aws_memorydb_cluster.memorydb_cluster.cluster_endpoint.port
+      host = aws_memorydb_cluster.memorydb_cluster.cluster_endpoint[0].address
+      port = aws_memorydb_cluster.memorydb_cluster.cluster_endpoint[0].port
       username = aws_memorydb_user.redis_user.user_name
-      tls      = aws_memorydb_cluster.memorydb_cluster.cluster_endpoint.tls_enabled
+      tls      = aws_memorydb_cluster.memorydb_cluster.cluster_endpoint[0].tls_enabled
     }
     secrets = {
       password = random_password.user_password.result
