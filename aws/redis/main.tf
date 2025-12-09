@@ -117,7 +117,7 @@ output "result" {
       host = aws_memorydb_cluster.memorydb_cluster.cluster_endpoint[0].address
       port = aws_memorydb_cluster.memorydb_cluster.cluster_endpoint[0].port
       username = aws_memorydb_user.redis_user.user_name
-      tls      = aws_memorydb_cluster.memorydb_cluster.cluster_endpoint[0].tls_enabled
+      tls      = aws_memorydb_cluster.memorydb_cluster.cluster_endpoint[0].tls
     }
     secrets = {
       password = random_password.user_password.result
