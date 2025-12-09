@@ -104,7 +104,7 @@ resource "aws_memorydb_cluster" "memorydb_cluster" {
   num_replicas_per_shard = var.num_replicas_per_shard
   acl_name               = aws_memorydb_acl.redis_acl.name
   subnet_group_name      = aws_memorydb_subnet_group.subnet_group.name
-  security_group_ids     = data.aws_security_groups.all_in_vpc
+  security_group_ids     = data.aws_security_groups.all_in_vpc.ids
   tags                   = { user = "zachcasper" }
 }
 
