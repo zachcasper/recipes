@@ -12,6 +12,25 @@ terraform {
 }
 
 # --- Variables ---
+variable "vpc_id" {
+  description = "The AWS VPC ID"
+  type        = string
+}
+
+data "aws_subnets" "this" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
+}
+
+data "aws_security_groups" "all_in_vpc" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
+}
+
 variable "capacity" {
   description = "Cluster size: S (small), M (medium), or L (large)"
   type        = string
@@ -52,53 +71,9 @@ resource "random_password" "user_password" {
 }
 
 # --- Networking ---
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
-  tags       = { user = "zachcasper" }
-}
-
-resource "aws_subnet" "subnet_a" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
-  map_public_ip_on_launch = true
-  tags       = { user = "zachcasper" }
-}
-
-resource "aws_subnet" "subnet_b" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
-  map_public_ip_on_launch = true
-  tags       = { user = "zachcasper" }
-}
-
 resource "aws_memorydb_subnet_group" "subnet_group" {
   name       = "memdb-subnets"
-  subnet_ids = [
-    aws_subnet.subnet_a.id,
-    aws_subnet.subnet_b.id
-  ]
-  tags = { user = "zachcasper" }
-}
-
-# --- Security Group for public access ---
-resource "aws_security_group" "memorydb_sg" {
-  name   = "memdb-sg-${random_id.resource.hex}"
-  vpc_id = aws_vpc.main.id
-
-  ingress {
-    from_port   = 6379
-    to_port     = 6379
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # open to all IPs
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
+  subnet_ids = data.aws_subnets.this
   tags = { user = "zachcasper" }
 }
 
@@ -129,8 +104,7 @@ resource "aws_memorydb_cluster" "memorydb_cluster" {
   num_replicas_per_shard = var.num_replicas_per_shard
   acl_name               = aws_memorydb_acl.redis_acl.name
   subnet_group_name      = aws_memorydb_subnet_group.subnet_group.name
-  security_group_ids     = [aws_security_group.memorydb_sg.id]
-  publicly_accessible    = true
+  security_group_ids     = data.aws_security_groups.all_in_vpc
   tags                   = { user = "zachcasper" }
 }
 
