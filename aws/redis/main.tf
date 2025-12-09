@@ -73,7 +73,7 @@ resource "random_password" "user_password" {
 # --- Networking ---
 resource "aws_memorydb_subnet_group" "subnet_group" {
   name       = "memdb-subnets"
-  subnet_ids = data.aws_subnets.this
+  subnet_ids = data.aws_subnets.this.ids
   tags = { user = "zachcasper" }
 }
 
