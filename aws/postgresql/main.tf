@@ -30,6 +30,10 @@ module "vpc" {
   enable_dns_support   = true
 }
 
+resource "random_id" "resource" {
+  byte_length = 4
+}
+
 resource "aws_db_subnet_group" "postgresql" {
   name       = "postgres-subnet-group-${random_id.resource.hex}"
   subnet_ids = module.vpc.public_subnets
