@@ -31,12 +31,12 @@ module "vpc" {
 }
 
 resource "aws_db_subnet_group" "postgresql" {
-  name       = "postgres-subnet-group"
+  name       = "postgres-subnet-group-${random_id.resource.hex}"
   subnet_ids = module.vpc.public_subnets
 }
 
 resource "aws_security_group" "rds" {
-  name   = "postgres-sg"
+  name   = "postgres-sg-${random_id.resource.hex}"
   vpc_id = module.vpc.vpc_id
 
   ingress {
@@ -63,7 +63,7 @@ resource "random_password" "db_password" {
 
 
 resource "aws_db_instance" "postgres" {
-  identifier             = "postgres"
+  identifier             = "postgres-${random_id.resource.hex}""
   instance_class         = "db.m7i.large"
   allocated_storage      = 5
   engine                 = "postgres"
