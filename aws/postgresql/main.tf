@@ -63,7 +63,7 @@ resource "random_password" "db_password" {
 
 
 resource "aws_db_instance" "postgres" {
-  identifier             = "postgres-${random_id.resource.hex}""
+  identifier             = "postgres-${random_id.resource.hex}"
   instance_class         = "db.m7i.large"
   allocated_storage      = 5
   engine                 = "postgres"
